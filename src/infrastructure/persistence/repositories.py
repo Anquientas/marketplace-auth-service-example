@@ -17,7 +17,9 @@ class SQLAlchemyUserRepository(UserRepository):
         return _to_entity(model)
 
     async def get_by_id(self, user_id: int) -> User | None:
-        raise NotImplementedError
+        statement = select(UserModel).where(UserModel.id == user_id)
+        row = (await self._session.execute(statement)).scalar_one_or_none()
+        return _to_entity(row) if row else None
 
     async def get_by_email(self, email: str) -> User | None:
         result = await self._session.execute(
