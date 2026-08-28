@@ -1,3 +1,4 @@
+from sqlalchemy import delete as alch_delete
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,7 +32,9 @@ class SQLAlchemyUserRepository(UserRepository):
         return _to_entity(model)
 
     async def delete(self, user_id: int) -> bool:
-        raise NotImplementedError
+        statement = alch_delete(UserModel).where(UserModel.id == user_id)
+        result = await self._session.execute(statement)
+        return result.rowcount > 0
 
 
 def _to_entity(model: UserModel) -> User:
